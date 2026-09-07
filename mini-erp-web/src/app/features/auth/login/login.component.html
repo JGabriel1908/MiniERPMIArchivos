@@ -1,1 +1,55 @@
-<p>login works!</p>
+<div class="container-fluid bg-light d-flex justify-content-center align-items-lg-center vh-100">
+  <div class="card shadow-lg border-0" style="width: 25rem;">
+    <div class="card-body p-5">
+      <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary">SISTEMA DE GESTIÓN COMERCIAL</h2>
+        <p class="text-muted">Ingrese sus datos para iniciar sesión</p>
+      </div>
+      @if (mensajeError) {
+        <div class="alert alert-danger text-center mb-4" role="alert">
+          {{ mensajeError }}
+        </div>
+      }
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="usuario" class="form-label fw-semibold">Username</label>
+          <input
+            type="text"
+            id="usuario"
+            class="form-control form-control-lg"
+            formControlName="usuario"
+            placeholder="Ej: admin_user"
+            [ngClass]="{'is-invalid': loginForm.get('usuario')?.invalid && loginForm.get('usuario')?.touched}"
+          >
+          @if (loginForm.get('usuario')?.invalid && loginForm.get('usuario')?.touched) {
+            <div class="invalid-feedback">
+              El usuario es obligatorio.
+            </div>
+          }
+        </div>
+        <div class="mb-4">
+          <label for="password" class="form-label fw-semibold">Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            class="form-control form-control-lg"
+            formControlName="password"
+            placeholder="********"
+            [ngClass]="{'is-invalid': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}"
+          >
+          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+            <div class="invalid-feedback">
+              La contraseña es obligatoria.
+            </div>
+          }
+        </div>
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg w-100"
+          [disabled]="loginForm.invalid">
+          Ingresar
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
