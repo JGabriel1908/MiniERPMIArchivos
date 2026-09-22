@@ -1,0 +1,97 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-primary mb-0">Gestión de Productos</h2>
+      <p class="text-muted">Administre los artículos disponibles para la venta y compra.</p>
+    </div>
+    <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalProducto" (click)="productoForm.reset({ precioVenta: 0, categoriaId: '' })">
+      <i class="bi bi-plus-circle"></i> Nuevo Producto
+    </button>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th scope="col" class="ps-4">Código</th>
+            <th scope="col">Nombre del Producto</th>
+            <th scope="col">Categoría</th>
+            <th scope="col" class="text-end">Precio de Venta</th>
+            <th scope="col" class="text-end pe-4">Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (prod of productos; track prod.id) {
+              <tr>
+                <td class="ps-4 fw-semibold text-muted">{{ prod.codigo }}</td>
+                <td class="fw-bold">{{ prod.nombre }}</td>
+                <td><span class="badge bg-secondary">{{ prod.categoria.nombre }}</span></td>
+                <td class="text-end fw-semibold text-success">Q {{ prod.precioVenta | number:'1.2-2' }}</td>
+                <td class="text-end pe-4">
+                  <button class="btn btn-sm btn-outline-danger" title="Dar de baja" (click)="eliminarProducto(prod.id)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="text-center py-4 text-muted">No hay productos registrados.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalProducto" tabindex="-1" aria-labelledby="modalProductoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold" id="modalProductoLabel">Datos del Producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="productoForm">
+          <div class="row mb-3">
+            <div class="col-md-5">
+              <label for="codigoProducto" class="form-label fw-semibold">Código *</label>
+              <input type="text" class="form-control" id="codigoProducto" formControlName="codigo" placeholder="Ej: PRD-001"
+                     [ngClass]="{'is-invalid': productoForm.get('codigo')?.invalid && productoForm.get('codigo')?.touched}">
+            </div>
+            <div class="col-md-7">
+              <label for="nombreProducto" class="form-label fw-semibold">Nombre *</label>
+              <input type="text" class="form-control" id="nombreProducto" formControlName="nombre" placeholder="Nombre comercial"
+                     [ngClass]="{'is-invalid': productoForm.get('nombre')?.invalid && productoForm.get('nombre')?.touched}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="categoriaId" class="form-label fw-semibold">Categoría *</label>
+            <select class="form-select" id="categoriaId" formControlName="categoriaId"
+                    [ngClass]="{'is-invalid': productoForm.get('categoriaId')?.invalid && productoForm.get('categoriaId')?.touched}">
+              <option value="" disabled selected>Seleccione una categoría...</option>
+              @for (cat of categorias; track cat.id) {
+                <option [value]="cat.id">{{ cat.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="precioVenta" class="form-label fw-semibold">Precio de Venta (Q) *</label>
+            <input type="number" step="0.01" class="form-control" id="precioVenta" formControlName="precioVenta" placeholder="0.00"
+                   [ngClass]="{'is-invalid': productoForm.get('precioVenta')?.invalid && productoForm.get('precioVenta')?.touched}">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="guardarProducto()" [disabled]="productoForm.invalid" data-bs-dismiss="modal">Guardar Producto</button>
+      </div>
+    </div>
+  </div>
+</div>

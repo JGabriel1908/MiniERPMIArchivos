@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { Router } from '@angular/router';
 import {AuthService} from '../../../core/services/auth.service';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -12,45 +12,34 @@ import {AuthService} from '../../../core/services/auth.service';
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  mensajeError: String = '';
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
-  private authService = inject(AuthService);
+  mensajeError: string = '';
 
-  constructor() {
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
       usuario: ['', Validators.required],
       password: ['', Validators.required]
     });
   }
 
-  onSubmit(): void {
-    if (this.loginForm.valid) {
-      const credenciales ={
-        userName: this.loginForm.value.usuario,
-        password: this.loginForm.value.password
-      };
+  onSubmit() {
+    if (this.loginForm.invalid) return;
 
-      this.authService.login(credenciales).subscribe({
-        next: (respuesta)=> {
-          console.log('se realizo login prueba', respuesta);
-          if (respuesta.rol == 'ADMINISTRACION'){
-            this.router.navigate(['/administracion']);
-          }else if(respuesta.rol == 'VENTAS'){
-            this.router.navigate(['/ventas']);
-          }else if(respuesta.rol == 'COMPRAS'){
-            this.router.navigate(['/compras']);
-          }else if(respuesta.rol == 'INVENTARIO'){
-            this.router.navigate(['/inventario']);
-          }
-        },
-        error:(err) => {
-          console.error('Error en login', err);
-          this.mensajeError = 'Username o constraseña incorrectas, intenta de nuevo. ';
-        }
-      });
-    }else {
-      this.loginForm.markAllAsTouched();
-    }
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (respuesta) => {
+        localStorage.setItem('token', respuesta.token);
+        localStorage.setItem('rolUsuario', respuesta.usuario.rol);
+        localStorage.setItem('nombreUsuario', respuesta.usuario.userName);
+
+        this.router.navigate(['/inicio']);
+      },
+      error: (err) => {
+        this.mensajeError = 'Usuario o contraseña incorrectos. Verifica tus credenciales.';
+        console.error(err);
+      }
+    });
   }
 }

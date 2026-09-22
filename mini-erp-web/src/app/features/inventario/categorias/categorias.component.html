@@ -1,0 +1,75 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-primary mb-0">Gestión de Categorías</h2>
+      <p class="text-muted">Clasifique sus productos para mantener el inventario ordenado.</p>
+    </div>
+    <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalCategoria" (click)="categoriaForm.reset()">
+      <i class="bi bi-plus-circle"></i> Nueva Categoría
+    </button>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th scope="col" class="ps-4" style="width: 10%;">ID</th>
+            <th scope="col" style="width: 30%;">Nombre</th>
+            <th scope="col" style="width: 45%;">Descripción</th>
+            <th scope="col" class="text-end pe-4" style="width: 15%;">Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (cat of categorias; track cat.id) {
+              <tr>
+                <td class="ps-4 fw-semibold text-muted">#{{ cat.id }}</td>
+                <td class="fw-bold">{{ cat.nombre }}</td>
+                <td>{{ cat.descripcion || 'Sin descripción' }}</td>
+                <td class="text-end pe-4">
+                  <button class="btn btn-sm btn-outline-danger" title="Eliminar" (click)="eliminarCategoria(cat.id)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="text-center py-4 text-muted">No hay categorías registradas.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalCategoria" tabindex="-1" aria-labelledby="modalCategoriaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold" id="modalCategoriaLabel">Datos de la Categoría</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="categoriaForm">
+          <div class="mb-3">
+            <label for="nombreCategoria" class="form-label fw-semibold">Nombre de la Categoría *</label>
+            <input type="text" class="form-control" id="nombreCategoria" formControlName="nombre" placeholder="Ej: Laptops, Periféricos, etc."
+                   [ngClass]="{'is-invalid': categoriaForm.get('nombre')?.invalid && categoriaForm.get('nombre')?.touched}">
+          </div>
+          <div class="mb-3">
+            <label for="descripcionCategoria" class="form-label fw-semibold">Descripción (Opcional)</label>
+            <textarea class="form-control" id="descripcionCategoria" formControlName="descripcion" rows="3" placeholder="Detalles sobre esta clasificación..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="guardarCategoria()" [disabled]="categoriaForm.invalid" data-bs-dismiss="modal">Guardar Categoría</button>
+      </div>
+    </div>
+  </div>
+</div>

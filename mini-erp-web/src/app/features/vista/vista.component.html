@@ -1,0 +1,48 @@
+<div class="container-fluid">
+  <div class="row flex-nowrap vh-100">
+
+    <!-- Panel Lateral -->
+    <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark shadow">
+      <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-4 text-white min-vh-100">
+
+        <a class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          <span class="fs-4 d-none d-sm-inline fw-bold text-primary">Mini ERP</span>
+        </a>
+        <hr class="w-100 text-secondary">
+
+        <!-- Opciones de Navegación -->
+        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start w-100">
+          <li class="nav-item w-100 mb-2">
+            <a routerLink="/administracion/inicio" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+              <span class="d-none d-sm-inline">Inicio</span>
+            </a>
+          </li>
+          <li class="nav-item w-100 mb-2">
+            <a routerLink="/administracion/usuarios" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+              <span class="d-none d-sm-inline">Gestión de Usuarios</span>
+            </a>
+          </li>
+        </ul>
+        <hr class="w-100 text-secondary">
+
+        <!-- Perfil y Cerrar Sesión -->
+        <div class="pb-4 w-100">
+          <div class="d-flex align-items-center text-white mb-3">
+            <span class="d-none d-sm-inline mx-2 fw-semibold">{{ usuarioActual }}</span>
+          </div>
+          <button class="btn btn-outline-danger w-100 btn-sm d-none d-sm-block" (click)="cerrarSesion()">
+            Cerrar Sesión
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Contenedor Dinámico Principal -->
+    <div class="col py-4 px-4 px-md-5 bg-light overflow-auto">
+      <router-outlet></router-outlet>
+    </div>
+
+  </div>
+</div>
+
