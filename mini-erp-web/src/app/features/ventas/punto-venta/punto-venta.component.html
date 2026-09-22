@@ -1,1 +1,143 @@
-<p>punto-venta works!</p>
+<div class="container-fluid p-4">
+  <div class="mb-4">
+    <h2 class="fw-bold text-primary mb-0">Punto de Venta</h2>
+    <p class="text-muted">Cree facturas y despache productos (Método de inventario PEPS automatizado).</p>
+  </div>
+
+  @if (mensajeError) {
+    <div class="alert alert-danger">{{ mensajeError }}</div>
+  }
+  @if (ultimaVentaId) {
+    <div class="alert alert-success d-flex justify-content-between align-items-center">
+      <span>Venta #{{ ultimaVentaId }} registrada correctamente. El inventario ya fue actualizado.</span>
+      <button class="btn btn-sm btn-success" (click)="descargarFactura()">Descargar Factura (PDF)</button>
+    </div>
+  }
+
+  <div class="row g-4">
+    <!-- Panel Izquierdo: Formularios -->
+    <div class="col-lg-4">
+
+      <!-- Cliente -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white fw-bold">
+          <i class="bi bi-person-badge me-2"></i> 1. Cliente a Facturar
+        </div>
+        <div class="card-body">
+          <form [formGroup]="ventaForm">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Seleccionar Cliente *</label>
+              <select class="form-select" formControlName="clienteId">
+                <option value="" disabled selected>Elija un cliente...</option>
+                @for (cliente of clientes; track cliente.id) {
+                  <option [value]="cliente.id">{{ cliente.nit }} - {{ cliente.nombre }} {{ cliente.apellido }}</option>
+                }
+              </select>
+            </div>
+            <div class="mb-0">
+              <label class="form-label fw-semibold">Fecha Emisión</label>
+              <input type="date" class="form-control" [value]="hoy" readonly>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Buscador de Productos -->
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white fw-bold">
+          <i class="bi bi-cart-plus me-2"></i> 2. Agregar Producto
+        </div>
+        <div class="card-body">
+          <form [formGroup]="productoForm">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Producto *</label>
+              <select class="form-select" formControlName="productoId">
+                <option value="" disabled selected>Catálogo de productos...</option>
+                @for (prod of productos; track prod.id) {
+                  <option [value]="prod.id">{{ prod.codigo }} - {{ prod.nombre }} (Q{{ prod.precioVenta }})</option>
+                }
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Cantidad *</label>
+              <input type="number" class="form-control" formControlName="cantidad" min="1">
+            </div>
+
+            <button type="button" class="btn btn-success w-100" (click)="agregarAlCarrito()" [disabled]="productoForm.invalid">
+              Agregar a la Factura
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel Derecho: Carrito / Factura -->
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+          <span class="fw-bold"><i class="bi bi-receipt me-2"></i> 3. Detalle de Venta</span>
+          <span class="badge bg-light text-dark rounded-pill">{{ carrito.length }} Ítems</span>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive" style="min-height: 300px; max-height: 400px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light sticky-top">
+              <tr>
+                <th scope="col" class="ps-3">Código</th>
+                <th scope="col">Producto</th>
+                <th scope="col" class="text-center">Cant.</th>
+                <th scope="col" class="text-end">Precio U.</th>
+                <th scope="col" class="text-end">Subtotal</th>
+                <th scope="col" class="text-center pe-3">Quitar</th>
+              </tr>
+              </thead>
+              <tbody>
+                @for (item of carrito; track item.productoId; let i = $index) {
+                  <tr>
+                    <td class="ps-3 text-muted">{{ item.codigo }}</td>
+                    <td class="fw-semibold">{{ item.nombre }}</td>
+                    <td class="text-center">{{ item.cantidad }}</td>
+                    <td class="text-end">Q {{ item.precioUnitario | number:'1.2-2' }}</td>
+                    <td class="text-end fw-bold">Q {{ item.subtotal | number:'1.2-2' }}</td>
+                    <td class="text-center pe-3">
+                      <button class="btn btn-sm btn-outline-danger border-0" (click)="quitarDelCarrito(i)">
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                      <i class="bi bi-cart-x fs-1 d-block mb-2"></i>
+                      El carrito está vacío. Agregue productos desde el panel izquierdo.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Totales y Botón Cobrar -->
+        <div class="card-footer bg-white border-top p-4">
+          <div class="row text-end mb-3">
+            <div class="col-8 text-muted">Subtotal:</div>
+            <div class="col-4 fw-semibold">Q {{ subtotalGral | number:'1.2-2' }}</div>
+            <div class="col-8 text-muted">IVA (12%):</div>
+            <div class="col-4 fw-semibold">Q {{ ivaGral | number:'1.2-2' }}</div>
+            <div class="col-8 fs-4 fw-bold mt-2">TOTAL:</div>
+            <div class="col-4 fs-4 fw-bold text-primary mt-2">Q {{ totalGral | number:'1.2-2' }}</div>
+          </div>
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button class="btn btn-outline-secondary btn-lg" (click)="limpiarCarrito()">Limpiar Todo</button>
+            <button class="btn btn-primary btn-lg px-5 shadow-sm" (click)="procesarVenta()" [disabled]="carrito.length === 0 || ventaForm.invalid || procesando">
+              {{ procesando ? 'Procesando...' : 'Procesar Venta' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

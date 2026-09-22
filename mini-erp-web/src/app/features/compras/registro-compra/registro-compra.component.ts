@@ -1,10 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProveedorService } from '../../../core/services/proveedor.service';
 import { CompraService } from '../../../core/services/compra.service';
+import { ProductoService } from '../../../core/services/producto.service';
 import { Proveedor } from '../../../core/models/proveedor';
-import { CompraRequest, DetalleCompra } from '../../../core/models/compra';
+import { Producto } from '../../../core/models/producto';
+import { CompraRequest } from '../../../core/models/compra';
+
+interface LineaDetalle {
+  productoId: number;
+  codigo: string;
+  nombre: string;
+  cantidad: number;
+  costoUnitario: number;
+  subtotal: number;
+}
 
 @Component({
   selector: 'app-registro-compra',
@@ -14,20 +25,26 @@ import { CompraRequest, DetalleCompra } from '../../../core/models/compra';
   templateUrl: './registro-compra.component.html'
 })
 export class RegistroCompraComponent implements OnInit {
+  private proveedorService = inject(ProveedorService);
+  private compraService = inject(CompraService);
+  private productoService = inject(ProductoService);
+  private fb = inject(FormBuilder);
+  private datePipe = inject(DatePipe);
+  private cdr = inject(ChangeDetectorRef);
+
   proveedores: Proveedor[] = [];
-  detalles: any[] = []; // Array temporal para mostrar en la tabla antes de guardar
-  totalCompra: number = 0;
+  productos: Producto[] = [];
+  detalles: LineaDetalle[] = [];
+  totalCompra = 0;
+  mensajeError = '';
+  mensajeExito = '';
+  procesando = false;
 
   compraForm: FormGroup;
   productoForm: FormGroup;
   hoy: string;
 
-  constructor(
-    private proveedorService: ProveedorService,
-    private compraService: CompraService,
-    private fb: FormBuilder,
-    private datePipe: DatePipe
-  ) {
+  constructor() {
     this.hoy = this.datePipe.transform(new Date(), 'yyyy-MM-dd') || '';
 
     this.compraForm = this.fb.group({
@@ -35,35 +52,50 @@ export class RegistroCompraComponent implements OnInit {
     });
 
     this.productoForm = this.fb.group({
-      productoId: ['', Validators.required], // En la vida real, lo llenarías desde la búsqueda
-      productoNombre: [''], // Para mostrar en la tabla
-      codigo: [''],
+      productoId: ['', Validators.required],
       cantidad: [1, [Validators.required, Validators.min(1)]],
       costoUnitario: [0, [Validators.required, Validators.min(0.01)]]
     });
   }
 
   ngOnInit(): void {
-    this.proveedorService.listarActivos().subscribe(data => this.proveedores = data);
+    this.proveedorService.listarActivos().subscribe({
+      next: (data) => {
+        this.proveedores = data;
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('Error al cargar proveedores', err)
+    });
+
+    this.productoService.listarActivos().subscribe({
+      next: (data) => {
+        this.productos = data;
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('Error al cargar productos', err)
+    });
   }
 
   agregarAlDetalle(): void {
     if (this.productoForm.invalid) return;
 
     const val = this.productoForm.value;
+    const producto = this.productos.find(p => p.id === Number(val.productoId));
+    if (!producto) return;
+
     const subtotal = val.cantidad * val.costoUnitario;
 
     this.detalles.push({
-      productoId: val.productoId,
-      codigo: val.codigo,
-      nombre: val.productoNombre,
+      productoId: producto.id!,
+      codigo: producto.codigo,
+      nombre: producto.nombre,
       cantidad: val.cantidad,
       costoUnitario: val.costoUnitario,
-      subtotal: subtotal
+      subtotal
     });
 
     this.calcularTotal();
-    this.productoForm.reset({ cantidad: 1, costoUnitario: 0 }); // Limpia para el siguiente
+    this.productoForm.reset({ productoId: '', cantidad: 1, costoUnitario: 0 });
   }
 
   quitarDelDetalle(index: number): void {
@@ -73,37 +105,43 @@ export class RegistroCompraComponent implements OnInit {
 
   calcularTotal(): void {
     this.totalCompra = this.detalles.reduce((acc, curr) => acc + curr.subtotal, 0);
+    this.cdr.markForCheck();
   }
 
   procesarIngreso(): void {
     if (this.compraForm.invalid || this.detalles.length === 0) {
-      alert('Seleccione un proveedor y agregue al menos un producto.');
+      this.mensajeError = 'Seleccione un proveedor y agregue al menos un producto.';
       return;
     }
 
+    this.mensajeError = '';
+    this.mensajeExito = '';
+    this.procesando = true;
+
     const request: CompraRequest = {
       compra: {
-        proveedor: { id: parseInt(this.compraForm.value.proveedorId, 10) },
-        usuario: { id: 1 }, // TODO: Obtener el ID del usuario logueado desde localStorage
-        totalCompra: this.totalCompra
+        proveedor: { id: parseInt(this.compraForm.value.proveedorId, 10) }
       },
       detalles: this.detalles.map(d => ({
-        producto: { id: parseInt(d.productoId, 10) },
+        producto: { id: d.productoId },
         cantidad: d.cantidad,
         costoUnitario: d.costoUnitario
       }))
     };
 
     this.compraService.registrarCompra(request).subscribe({
-      next: (res) => {
-        alert('Compra registrada y lotes generados exitosamente.');
-        this.detalles = []; // Limpiamos
+      next: (compra) => {
+        this.procesando = false;
+        this.mensajeExito = `Compra #${compra.id} registrada correctamente. El inventario ya fue actualizado.`;
+        this.detalles = [];
         this.calcularTotal();
         this.compraForm.reset();
+        this.cdr.markForCheck();
       },
       error: (err) => {
-        alert('Error al registrar la compra.');
-        console.error(err);
+        this.procesando = false;
+        this.mensajeError = err?.error ?? 'Ocurrió un error al registrar la compra.';
+        this.cdr.markForCheck();
       }
     });
   }

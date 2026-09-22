@@ -10,8 +10,6 @@ export interface DetalleCompra {
 export interface CompraRequest {
   compra: {
     proveedor: { id: number };
-    usuario: { id: number };
-    totalCompra: number;
   };
   detalles: DetalleCompra[];
 }

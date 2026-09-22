@@ -4,6 +4,8 @@
  */
 package com.cunoc.minierp_backend.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 /**
  *
@@ -26,8 +28,8 @@ public class User {
     private String name;
     @Column(name = "last_name", nullable = false)
     private String lastName;
-    @Column
-    private String photo;
+    @Column(nullable = false)
+    private Boolean activo = true;
 
     public Integer getId() {
         return id;
@@ -45,10 +47,12 @@ public class User {
         this.userName = userName;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }
@@ -77,12 +81,12 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getPhoto() {
-        return photo;
+    public Boolean getActivo() {
+        return activo;
     }
 
-    public void setPhoto(String photo) {
-        this.photo = photo;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
-    
+
 }

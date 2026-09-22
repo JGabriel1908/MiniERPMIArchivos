@@ -1,1 +1,28 @@
-<p>inicio works!</p>
+<div class="container-fluid">
+  <div class="mb-4">
+    <h3 class="text-dark fw-bold mb-0">Bienvenido, {{ nombreUsuario }}</h3>
+    <p class="text-muted mb-0">Panel de administración de Mini ERP.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <h5 class="card-title fw-semibold">Gestión de Usuarios</h5>
+          <p class="card-text text-muted">Crea, edita y desactiva las cuentas del sistema, asignando el rol correspondiente a cada área.</p>
+          <a routerLink="/administracion/usuarios" class="btn btn-outline-primary">Ir a Usuarios</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <h5 class="card-title fw-semibold">Reportes</h5>
+          <p class="card-text text-muted">Consulta productos, compras, ventas y la actividad reciente de los usuarios en el sistema.</p>
+          <a routerLink="/administracion/reportes" class="btn btn-outline-primary">Ir a Reportes</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

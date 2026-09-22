@@ -22,41 +22,51 @@ public class CustomerService {
 
     @Autowired
     private CustomerRepository clienteRepository;
+    @Autowired
+    private LogService logService;
 
-    // 1. LEER (Obtener todos los activos)
     public List<Customer> obtenerClientesActivos() {
         return clienteRepository.findByActivoTrue();
     }
 
-    // 2. CREAR
     public Customer crearCliente(Customer nuevoCliente) {
+        if (clienteRepository.existsByNit(nuevoCliente.getNit())) {
+            throw new RuntimeException("Ya existe un cliente registrado con ese NIT");
+        }
         nuevoCliente.setActivo(true); // Por defecto nace activo
-        return clienteRepository.save(nuevoCliente);
+        Customer guardado = clienteRepository.save(nuevoCliente);
+        logService.registrar("CREACION", "CLIENTES", "Se creó el cliente '" + guardado.getNombre() + " " + guardado.getApellido() + "'");
+        return guardado;
     }
 
-    // 3. ACTUALIZAR
     public Customer actualizarCliente(Integer id, Customer clienteActualizado) {
         Optional<Customer> clienteExistente = clienteRepository.findById(id);
-        
+
         if (clienteExistente.isPresent()) {
             Customer cliente = clienteExistente.get();
+            if (!cliente.getNit().equals(clienteActualizado.getNit())
+                    && clienteRepository.existsByNit(clienteActualizado.getNit())) {
+                throw new RuntimeException("Ya existe un cliente registrado con ese NIT");
+            }
             cliente.setNit(clienteActualizado.getNit());
             cliente.setNombre(clienteActualizado.getNombre());
             cliente.setApellido(clienteActualizado.getApellido());
             cliente.setDireccion(clienteActualizado.getDireccion());
             cliente.setCorreo(clienteActualizado.getCorreo());
-            return clienteRepository.save(cliente);
+            Customer actualizado = clienteRepository.save(cliente);
+            logService.registrar("ACTUALIZACION", "CLIENTES", "Se actualizó el cliente '" + actualizado.getNombre() + " " + actualizado.getApellido() + "'");
+            return actualizado;
         }
-        return null; // O podrías lanzar una excepción
+        return null; 
     }
 
-    // 4. ELIMINAR (Borrado Lógico)
     public void eliminarCliente(Integer id) {
         Optional<Customer> clienteExistente = clienteRepository.findById(id);
         if (clienteExistente.isPresent()) {
             Customer cliente = clienteExistente.get();
-            cliente.setActivo(false); // Lo "apagamos" en lugar de borrarlo de la BD
+            cliente.setActivo(false); 
             clienteRepository.save(cliente);
+            logService.registrar("ELIMINACION", "CLIENTES", "Se desactivó el cliente '" + cliente.getNombre() + " " + cliente.getApellido() + "'");
         }
     }
 }

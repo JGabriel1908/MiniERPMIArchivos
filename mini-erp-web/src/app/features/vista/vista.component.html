@@ -12,16 +12,64 @@
 
         <!-- Opciones de Navegación -->
         <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start w-100">
-          <li class="nav-item w-100 mb-2">
-            <a routerLink="/administracion/inicio" routerLinkActive="active" class="nav-link text-white px-3 text-start">
-              <span class="d-none d-sm-inline">Inicio</span>
-            </a>
-          </li>
-          <li class="nav-item w-100 mb-2">
-            <a routerLink="/administracion/usuarios" routerLinkActive="active" class="nav-link text-white px-3 text-start">
-              <span class="d-none d-sm-inline">Gestión de Usuarios</span>
-            </a>
-          </li>
+          @if (esAdministrador()) {
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/administracion/inicio" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Inicio</span>
+              </a>
+            </li>
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/administracion/usuarios" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Gestión de Usuarios</span>
+              </a>
+            </li>
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/administracion/reportes" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Reportes</span>
+              </a>
+            </li>
+          }
+          @if (esCompras()) {
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/compras/proveedores" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Proveedores</span>
+              </a>
+            </li>
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/compras/registro-compra" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Registro de Compra</span>
+              </a>
+            </li>
+          }
+          @if (esInventario()) {
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/inventario/categorias" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Categorías</span>
+              </a>
+            </li>
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/inventario/productos" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Productos</span>
+              </a>
+            </li>
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/inventario/kardex" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Existencias y Kardex</span>
+              </a>
+            </li>
+          }
+          @if (esVentas()) {
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/ventas/clientes" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Clientes</span>
+              </a>
+            </li>
+            <li class="nav-item w-100 mb-2">
+              <a routerLink="/ventas/punto-venta" routerLinkActive="active" class="nav-link text-white px-3 text-start">
+                <span class="d-none d-sm-inline">Punto de Venta</span>
+              </a>
+            </li>
+          }
         </ul>
         <hr class="w-100 text-secondary">
 

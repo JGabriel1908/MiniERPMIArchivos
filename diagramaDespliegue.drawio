@@ -1,0 +1,37 @@
+<mxfile host="Electron">
+  <diagram name="Despliegue" id="despliegue1">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1320" pageHeight="450" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="node-1" parent="1" vertex="1" value="&lt;&lt;device&gt;&gt;&lt;br&gt;&lt;b&gt;PC Cliente&lt;/b&gt;" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;align=center;verticalAlign=top;spacingTop=8;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;">
+          <mxGeometry x="40" y="160" width="320" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="art-2" parent="1" vertex="1" value="&lt;&lt;artifact&gt;&gt;&lt;br&gt;mini-erp-web (Angular 21)&lt;br&gt;ejecutándose en el navegador web" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=14;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;">
+          <mxGeometry x="70" y="230" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="node-3" parent="1" vertex="1" value="&lt;&lt;execution environment&gt;&gt;&lt;br&gt;&lt;b&gt;Servidor de Aplicaciones&lt;/b&gt;" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;align=center;verticalAlign=top;spacingTop=8;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;">
+          <mxGeometry x="480" y="160" width="340" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="art-4" parent="1" vertex="1" value="&lt;&lt;artifact&gt;&gt;&lt;br&gt;minierp-backend.jar&lt;br&gt;(Spring Boot 4 + Tomcat embebido, puerto 8080)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=14;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;">
+          <mxGeometry x="510" y="230" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="node-5" parent="1" vertex="1" value="&lt;&lt;device&gt;&gt;&lt;br&gt;&lt;b&gt;Servidor de Base de Datos&lt;/b&gt;" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;align=center;verticalAlign=top;spacingTop=8;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;">
+          <mxGeometry x="940" y="160" width="320" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="art-6" parent="1" vertex="1" value="&lt;&lt;artifact&gt;&gt;&lt;br&gt;PostgreSQL 16&lt;br&gt;base minierp_db, esquema erp_schema" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;size=14;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;">
+          <mxGeometry x="970" y="230" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="path-7" parent="1" edge="1" source="node-1" target="node-3" value="HTTP/HTTPS  -  REST API (JSON)  -  puerto 8080" style="endArrow=open;startArrow=open;html=1;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;exitY=0.5;exitX=1;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="path-8" parent="1" edge="1" source="node-3" target="node-5" value="JDBC  -  puerto 5432" style="endArrow=open;startArrow=open;html=1;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;exitY=0.5;exitX=1;entryX=0;entryY=0.5;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="titulo-9" parent="1" vertex="1" value="Diagrama de Despliegue &#8212; Mini ERP" style="text;html=1;fontSize=20;fontStyle=1;align=left;">
+          <mxGeometry x="40" y="40" width="600" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

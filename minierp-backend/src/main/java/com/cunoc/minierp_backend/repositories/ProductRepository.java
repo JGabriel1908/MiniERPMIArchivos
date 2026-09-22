@@ -16,6 +16,9 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Integer> {
     
-    @Query("SELECT l.producto, SUM(l.cantidadActual) as total FROM Lote l GROUP BY l.producto ORDER BY total ASC")
+    @Query("SELECT l.producto, SUM(l.cantidadActual) as total FROM Lot l GROUP BY l.producto ORDER BY total ASC")
     List<Object[]> findProductosConMenorExistencia(Pageable pageable);
+    List<Product> findByActivoTrue();
+
+    boolean existsByCodigo(String codigo);
 }

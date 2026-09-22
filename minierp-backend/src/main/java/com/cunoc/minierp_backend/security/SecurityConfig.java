@@ -42,7 +42,15 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
 
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                .requestMatchers("/api/usuarios/**").hasRole("ADMINISTRACION")
+                .requestMatchers("/api/reportes/**").hasRole("ADMINISTRACION")
+                .requestMatchers("/api/proveedores/**", "/api/compras/**").hasAnyRole("COMPRAS", "ADMINISTRACION")
+
+                .requestMatchers("/api/productos/**", "/api/categorias/**", "/api/inventario/**")
+                    .hasAnyRole("INVENTARIO", "ADMINISTRACION")
+                .requestMatchers("/api/ventas/**", "/api/clientes/**").hasAnyRole("VENTAS", "ADMINISTRACION")
 
                 .anyRequest().authenticated()
             )

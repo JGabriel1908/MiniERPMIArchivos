@@ -19,6 +19,12 @@ public interface SaleRepository extends JpaRepository<Sale, Integer> {
     
     List<Sale> findByFechaBetween(LocalDateTime inicio, LocalDateTime fin);
 
-    @Query("SELECT v.cliente, SUM(v.total) as total FROM Venta v GROUP BY v.cliente ORDER BY total DESC")
+    List<Sale> findByClienteIdOrderByFechaDesc(Integer clienteId);
+
+    @Query("SELECT v.cliente, SUM(v.total) as total FROM Sale v GROUP BY v.cliente ORDER BY total DESC")
     List<Object[]> findTopClientes(Pageable pageable);
+
+    @Query(value = "SELECT date_trunc(:unidad, fecha) as periodo, COUNT(*) as cantidad, SUM(total) as total " +
+            "FROM ventas GROUP BY periodo ORDER BY periodo", nativeQuery = true)
+    List<Object[]> resumenPorPeriodo(@org.springframework.data.repository.query.Param("unidad") String unidad);
 }

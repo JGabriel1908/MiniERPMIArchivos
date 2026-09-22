@@ -14,4 +14,8 @@ export class CompraService {
   registrarCompra(request: CompraRequest): Observable<any> {
     return this.http.post<any>(this.apiUrl, request);
   }
+
+  listar(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
+  }
 }

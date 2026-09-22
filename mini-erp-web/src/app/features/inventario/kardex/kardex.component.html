@@ -1,1 +1,111 @@
-<p>kardex works!</p>
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-primary mb-0">Existencias y Kardex</h2>
+      <p class="text-muted">Consulta las existencias actuales y el historial de movimientos de cada producto.</p>
+    </div>
+    @if (productosConStockBajo > 0) {
+      <span class="badge bg-danger px-3 py-2">
+        {{ productosConStockBajo }} producto(s) con existencias bajas
+      </span>
+    }
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white fw-semibold d-flex justify-content-between align-items-center">
+          <span>Existencias por Producto</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="cargarExistencias()">Actualizar</button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Código</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th class="text-end">Existencia</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (e of existencias; track e.productoId) {
+                <tr [class.table-danger]="e.stockBajo">
+                  <td>{{ e.codigo }}</td>
+                  <td class="fw-semibold">{{ e.nombre }}</td>
+                  <td>{{ e.categoria || '—' }}</td>
+                  <td class="text-end">
+                    {{ e.stockActual }}
+                    @if (e.stockBajo) {
+                      <span class="badge bg-danger ms-1">Bajo</span>
+                    }
+                  </td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-primary" (click)="verKardex(e)">Ver Kardex</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">No hay productos activos registrados.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white fw-semibold">
+          @if (productoSeleccionado) {
+            Kardex — {{ productoSeleccionado.codigo }} {{ productoSeleccionado.nombre }}
+          } @else {
+            Historial de Movimientos
+          }
+        </div>
+        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+          <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th class="text-end">Cantidad</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (!productoSeleccionado) {
+                <tr>
+                  <td colspan="4" class="text-center py-4 text-muted">Selecciona "Ver Kardex" en un producto.</td>
+                </tr>
+              } @else if (cargandoMovimientos) {
+                <tr>
+                  <td colspan="4" class="text-center py-4 text-muted">Cargando movimientos...</td>
+                </tr>
+              } @else {
+                @for (m of movimientos; track m.id) {
+                  <tr>
+                    <td>{{ m.fecha | date:'short' }}</td>
+                    <td>
+                      <span class="badge" [class.bg-success]="m.tipoMovimiento === 'ENTRADA'" [class.bg-danger]="m.tipoMovimiento === 'SALIDA'">
+                        {{ m.tipoMovimiento }}
+                      </span>
+                    </td>
+                    <td class="text-end">{{ m.cantidad }}</td>
+                    <td>{{ m.motivo }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">Este producto no tiene movimientos registrados.</td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

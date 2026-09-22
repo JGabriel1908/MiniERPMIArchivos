@@ -1,7 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable, tap} from 'rxjs';
-import {createResponse} from '@angular/cli/src/commands/mcp/tools/onpush-zoneless-migration/prompts';
 
 @Injectable({
   providedIn: 'root'
@@ -17,5 +16,21 @@ export class AuthService {
         sessionStorage.setItem('usuario', response.usuario);
       })
     );
+  }
+
+  getToken(): string | null {
+    return sessionStorage.getItem('token');
+  }
+
+  getRol(): string | null {
+    return sessionStorage.getItem('rol');
+  }
+
+  estaAutenticado(): boolean {
+    return !!this.getToken();
+  }
+
+  cerrarSesion(): void {
+    sessionStorage.clear();
   }
 }

@@ -16,11 +16,11 @@ import java.util.List;
 
 public interface SaleDetailsRepository extends JpaRepository<SaleDetails, Integer> {
     
-    // Reporte: Top 10 productos más vendidos
-    @Query("SELECT dv.producto, SUM(dv.cantidad) as totalVendido FROM DetalleVenta dv GROUP BY dv.producto ORDER BY totalVendido DESC")
+    @Query("SELECT dv.producto, SUM(dv.cantidad) as totalVendido FROM SaleDetails dv GROUP BY dv.producto ORDER BY totalVendido DESC")
     List<Object[]> findTopProductosMasVendidos(Pageable pageable);
 
-    // Reporte: Top 10 productos que han generado mayores ingresos
-    @Query("SELECT dv.producto, SUM(dv.subtotalLinea) as ingresos FROM DetalleVenta dv GROUP BY dv.producto ORDER BY ingresos DESC")
+    @Query("SELECT dv.producto, SUM(dv.subtotalLinea) as ingresos FROM SaleDetails dv GROUP BY dv.producto ORDER BY ingresos DESC")
     List<Object[]> findTopProductosMayoresIngresos(Pageable pageable);
+
+    List<SaleDetails> findByVentaId(Integer ventaId);
 }

@@ -4,8 +4,8 @@
       <h2 class="fw-bold text-primary mb-0">Gestión de Proveedores</h2>
       <p class="text-muted">Administre el catálogo de empresas que abastecen su negocio.</p>
     </div>
-    <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalProveedor" (click)="proveedorForm.reset()">
-      <i class="bi bi-plus-circle"></i> Nuevo Proveedor
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalProveedor" (click)="prepararNuevo()">
+      + Nuevo Proveedor
     </button>
   </div>
   <div class="card shadow-sm border-0">
@@ -29,12 +29,11 @@
                 <td>{{ proveedor.telefono }}</td>
                 <td>{{ proveedor.direccion }}</td>
                 <td class="text-end pe-4">
-                  <!-- Botón Editar preparado para el futuro -->
-                  <button class="btn btn-sm btn-outline-secondary me-2" title="Editar">
-                    <i class="bi bi-pencil-square"></i>
+                  <button class="btn btn-sm btn-outline-secondary me-2" title="Editar" (click)="prepararEdicion(proveedor)">
+                    Editar
                   </button>
                   <button class="btn btn-sm btn-outline-danger" title="Dar de baja" (click)="eliminarProveedor(proveedor.id)">
-                    <i class="bi bi-trash"></i>
+                    Eliminar
                   </button>
                 </td>
               </tr>
@@ -55,10 +54,13 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-light">
-        <h5 class="modal-title fw-bold" id="modalProveedorLabel">Datos del Proveedor</h5>
+        <h5 class="modal-title fw-bold" id="modalProveedorLabel">{{ editando ? 'Editar Proveedor' : 'Datos del Proveedor' }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        @if (mensajeError) {
+          <div class="alert alert-danger py-2">{{ mensajeError }}</div>
+        }
         <form [formGroup]="proveedorForm">
           <div class="mb-3">
             <label for="nitProveedor" class="form-label fw-semibold">NIT *</label>
@@ -82,7 +84,9 @@
       </div>
       <div class="modal-footer bg-light">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary" (click)="guardarProveedor()" [disabled]="proveedorForm.invalid" data-bs-dismiss="modal">Guardar Proveedor</button>
+        <button type="button" class="btn btn-primary" (click)="guardarProveedor()" [disabled]="proveedorForm.invalid">
+          {{ editando ? 'Guardar Cambios' : 'Guardar Proveedor' }}
+        </button>
       </div>
     </div>
   </div>

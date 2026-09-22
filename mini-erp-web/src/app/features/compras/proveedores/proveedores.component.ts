@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProveedorService } from '../../../core/services/proveedor.service';
 import { Proveedor } from '../../../core/models/proveedor';
+
+declare const bootstrap: any;
 
 @Component({
   selector: 'app-proveedores',
@@ -11,13 +13,17 @@ import { Proveedor } from '../../../core/models/proveedor';
   templateUrl: './proveedores.component.html'
 })
 export class ProveedoresComponent implements OnInit {
+  private proveedorService = inject(ProveedorService);
+  private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
+
   proveedores: Proveedor[] = [];
   proveedorForm: FormGroup;
+  editando = false;
+  idEnEdicion: number | null = null;
+  mensajeError = '';
 
-  constructor(
-    private proveedorService: ProveedorService,
-    private fb: FormBuilder
-  ) {
+  constructor() {
     this.proveedorForm = this.fb.group({
       nit: ['', Validators.required],
       nombreProveedor: ['', Validators.required],
@@ -33,37 +39,69 @@ export class ProveedoresComponent implements OnInit {
   cargarProveedores(): void {
     this.proveedorService.listarActivos().subscribe({
       next: (data) => {
-        this.proveedores = data; // Extrae los datos de PostgreSQL
+        this.proveedores = data;
+        this.cdr.markForCheck();
       },
       error: (err) => console.error('Error al cargar proveedores', err)
     });
   }
 
+  prepararNuevo(): void {
+    this.editando = false;
+    this.idEnEdicion = null;
+    this.mensajeError = '';
+    this.proveedorForm.reset();
+  }
+
+  prepararEdicion(proveedor: Proveedor): void {
+    this.editando = true;
+    this.idEnEdicion = proveedor.id ?? null;
+    this.mensajeError = '';
+    this.proveedorForm.reset({
+      nit: proveedor.nit,
+      nombreProveedor: proveedor.nombreProveedor,
+      telefono: proveedor.telefono,
+      direccion: proveedor.direccion
+    });
+
+    const modalElement = document.getElementById('modalProveedor');
+    if (modalElement) {
+      bootstrap.Modal.getOrCreateInstance(modalElement).show();
+    }
+  }
+
   guardarProveedor(): void {
     if (this.proveedorForm.invalid) return;
 
-    const nuevoProveedor: Proveedor = {
-      ...this.proveedorForm.value,
-      activo: true
-    };
+    this.mensajeError = '';
+    const datos: Proveedor = { ...this.proveedorForm.value, activo: true };
 
-    this.proveedorService.guardar(nuevoProveedor).subscribe({
+    const peticion = this.editando && this.idEnEdicion
+      ? this.proveedorService.actualizar(this.idEnEdicion, datos)
+      : this.proveedorService.guardar(datos);
+
+    peticion.subscribe({
       next: () => {
-        this.cargarProveedores(); // Recarga la tabla
-        this.proveedorForm.reset();
-        // Aquí puedes agregar código para cerrar el modal usando Bootstrap JS o ViewChild
+        this.cargarProveedores();
+        const modalElement = document.getElementById('modalProveedor');
+        if (modalElement) {
+          bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+        }
       },
-      error: (err) => console.error('Error al guardar proveedor', err)
+      error: (err) => {
+        this.mensajeError = err?.error ?? 'Ocurrió un error al guardar el proveedor.';
+        this.cdr.markForCheck();
+      }
     });
   }
 
   eliminarProveedor(id: number | undefined): void {
     if (!id) return;
-    if (confirm('¿Está seguro de dar de baja a este proveedor?')) {
-      this.proveedorService.eliminar(id).subscribe({
-        next: () => this.cargarProveedores(),
-        error: (err) => console.error('Error al eliminar proveedor', err)
-      });
-    }
+    if (!confirm('¿Está seguro de dar de baja a este proveedor?')) return;
+
+    this.proveedorService.eliminar(id).subscribe({
+      next: () => this.cargarProveedores(),
+      error: (err) => console.error('Error al eliminar proveedor', err)
+    });
   }
 }

@@ -18,6 +18,6 @@ public interface MotionRepository extends JpaRepository<Motion, Integer> {
     
     List<Motion> findByProductoIdOrderByFechaDesc(Integer productoId);
 
-    @Query("SELECT m.producto, COUNT(m.id) as totalMovimientos FROM Movimiento m GROUP BY m.producto ORDER BY totalMovimientos DESC")
+    @Query("SELECT m.producto, COUNT(m.id) as totalMovimientos FROM Motion m GROUP BY m.producto ORDER BY totalMovimientos DESC")
     List<Object[]> findProductosConMasMovimientos(Pageable pageable);
 }

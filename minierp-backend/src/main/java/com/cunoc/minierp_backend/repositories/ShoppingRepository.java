@@ -19,6 +19,6 @@ public interface ShoppingRepository extends JpaRepository<Shopping, Integer> {
     
     List<Shopping> findByFechaBetween(LocalDateTime inicio, LocalDateTime fin);
 
-    @Query("SELECT c.proveedor, SUM(c.totalCompra) as total FROM Compra c GROUP BY c.proveedor ORDER BY total DESC")
+    @Query("SELECT c.proveedor, SUM(c.totalCompra) as total FROM Shopping c GROUP BY c.proveedor ORDER BY total DESC")
     List<Object[]> findTopProveedores(Pageable pageable);
 }

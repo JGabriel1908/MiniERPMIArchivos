@@ -37,6 +37,9 @@ public class PurchaseDetails {
     @Column(name = "costo_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal costoUnitario;
 
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal subtotal;
+
     public Integer getId() {
         return id;
     }
@@ -84,6 +87,12 @@ public class PurchaseDetails {
     public void setCostoUnitario(BigDecimal costoUnitario) {
         this.costoUnitario = costoUnitario;
     }
-    
-    
+
+    public BigDecimal getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(BigDecimal subtotal) {
+        this.subtotal = subtotal;
+    }
 }

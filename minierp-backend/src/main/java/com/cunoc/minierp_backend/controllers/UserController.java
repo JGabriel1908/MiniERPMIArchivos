@@ -1,17 +1,13 @@
 package com.cunoc.minierp_backend.controllers;
 
 import com.cunoc.minierp_backend.models.User;
-import com.cunoc.minierp_backend.models.Rol;
-import com.cunoc.minierp_backend.repositories.UserRepository;
-// Importa tu repositorio de usuarios aquí
+import com.cunoc.minierp_backend.models.dto.UserResponse;
+import com.cunoc.minierp_backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -19,29 +15,43 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    private UserRepository usuarioRepository; 
+    private UserService usuarioService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> obtenerTodos() {
+        return ResponseEntity.ok(usuarioService.listarActivos());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerPorId(@PathVariable Integer id) {
+        try {
+            return ResponseEntity.ok(usuarioService.obtenerPorId(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
     @PostMapping
     public ResponseEntity<?> crearUsuario(@RequestBody User nuevoUsuario) {
-        
-        String passwordEncriptada = passwordEncoder.encode(nuevoUsuario.getPassword());
-        nuevoUsuario.setPassword(passwordEncriptada);
-        
-        User usuarioGuardado = usuarioRepository.save(nuevoUsuario);
-
-        Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("mensaje", "Usuario creado con éxito");
-        respuesta.put("usuario", usuarioGuardado);
-        
-        return ResponseEntity.ok(respuesta);
+        try {
+            return ResponseEntity.ok(usuarioService.crear(nuevoUsuario));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
-    
-    @GetMapping
-    public ResponseEntity<?> obtenerTodos() {
-        List<User> usuarios = usuarioRepository.findAll();
-        return ResponseEntity.ok(usuarios);
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Integer id, @RequestBody User datosActualizados) {
+        try {
+            return ResponseEntity.ok(usuarioService.actualizar(id, datosActualizados));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Integer id) {
+        usuarioService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }

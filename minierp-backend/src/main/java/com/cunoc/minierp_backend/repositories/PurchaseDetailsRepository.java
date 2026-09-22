@@ -15,7 +15,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface PurchaseDetailsRepository extends JpaRepository<PurchaseDetails, Integer> {
-    
-    @Query("SELECT dc.producto, COUNT(dc.compra) as frecuencia FROM DetalleCompra dc GROUP BY dc.producto ORDER BY frecuencia DESC")
+
+    @Query("SELECT dc.producto, COUNT(dc.compra) as frecuencia FROM PurchaseDetails dc GROUP BY dc.producto ORDER BY frecuencia DESC")
     List<Object[]> findProductosCompradosConFrecuencia(Pageable pageable);
+
+    List<PurchaseDetails> findByCompraId(Integer compraId);
 }

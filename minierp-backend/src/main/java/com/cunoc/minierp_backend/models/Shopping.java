@@ -21,16 +21,16 @@ public class Shopping {
 
     @ManyToOne
     @JoinColumn(name = "proveedor_id", nullable = false)
-    private Supplier propveedor;
+    private Supplier proveedor;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private User usuario;
 
-    @Column
+    @Column(name = "fecha_compra")
     private LocalDateTime fecha;
 
-    @Column(name = "total_compra", nullable = false, precision = 10, scale = 2)
+    @Column(name = "total", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalCompra;
 
     public Integer getId() {
@@ -41,12 +41,12 @@ public class Shopping {
         this.id = id;
     }
 
-    public Supplier getPropveedor() {
-        return propveedor;
+    public Supplier getProveedor() {
+        return proveedor;
     }
 
-    public void setPropveedor(Supplier propveedor) {
-        this.propveedor = propveedor;
+    public void setProveedor(Supplier proveedor) {
+        this.proveedor = proveedor;
     }
 
     public User getUsuario() {

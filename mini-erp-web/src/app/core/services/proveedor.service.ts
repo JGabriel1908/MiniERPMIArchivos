@@ -19,6 +19,10 @@ export class ProveedorService {
     return this.http.post<Proveedor>(this.apiUrl, proveedor);
   }
 
+  actualizar(id: number, proveedor: Proveedor): Observable<Proveedor> {
+    return this.http.put<Proveedor>(`${this.apiUrl}/${id}`, proveedor);
+  }
+
   eliminar(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
